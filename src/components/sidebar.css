@@ -1,0 +1,9 @@
+.collapsed-layout {
+  margin-left: 80px;
+  transition: margin-left 0.2s;
+}
+
+.expanded-layout {
+  margin-left: 200px;
+  transition: margin-left 0.2s;
+}
