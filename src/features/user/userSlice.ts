@@ -15,7 +15,7 @@ export interface User {
   address: string | null;
   cnic: number | null;
   password: string | null;
-  role_id: number | null;
+  roleId: number | null;
 }
 
 interface UserState {
@@ -61,11 +61,12 @@ export const { setUsers, setLoading, setError, deleteUser } = userSlice.actions;
 export default userSlice.reducer;
 
 // Thunk to fetch accounts from API
-export const fetchUser = (): AppThunk => async (dispatch) => {
+export const fetchUsers = (): AppThunk => async (dispatch) => {
   try {
     dispatch(setLoading(true));
     const response = await axios.get<User[]>(apiEndpoints.fetchUsers); // Replace with your actual API endpoint
     dispatch(setUsers(response.data));
+    dispatch(setLoading(false));
   } catch (error) {
     dispatch(setError(error.message || 'Failed to fetch accounts'));
   }
@@ -87,7 +88,7 @@ export const addUser = (newUser: User): AppThunk => async (dispatch, getState) =
 export const deleteUserFromAPI = (userId: string): AppThunk => async (dispatch) => {
   try {
     dispatch(setLoading(true));
-    await axios.delete(apiEndpoints.deleteAccount(userId)); // Replace with your actual API endpoint
+    await axios.delete(apiEndpoints.deleteUser(userId)); // Replace with your actual API endpoint
     dispatch(deleteUser(userId)); // Dispatch the deleteAccount action to update the state
     dispatch(setLoading(false));
   } catch (error) {

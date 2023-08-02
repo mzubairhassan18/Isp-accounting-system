@@ -1,9 +1,10 @@
 // src/components/AddEntityButton.tsx
 
 import React, { useState } from 'react';
-import { Button, Modal, Form, Input, message, Spin } from 'antd';
+import { Button, Modal, Form, Input, message, Spin, Drawer } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, AppThunk, RootState } from 'store';
+import { SaveOutlined, PlusCircleOutlined } from '@ant-design/icons';
 
 export interface FormInput {
   name: string;
@@ -12,14 +13,14 @@ export interface FormInput {
   inputElement: React.ReactNode; // The custom form input element
 }
 
-interface AddEntityButtonProps {
+interface AddListFormProps {
   entityName: string;
   entityLabel: string;
   formInputs: FormInput[]; // Custom form inputs for the entity
   addEntityAction: (values: any) => AppThunk; // The thunk action to add the entity
 }
 
-const AddEntityButton: React.FC<AddEntityButtonProps> = ({
+const AddListForm: React.FC<AddListFormProps> = ({
   entityName,
   entityLabel,
   formInputs,
@@ -42,8 +43,7 @@ const AddEntityButton: React.FC<AddEntityButtonProps> = ({
       setVisible(false);
       message.success(`${entityLabel} added successfully.`);
     } catch (error) {
-      console.log("error", error);
-      message.error(error.message);
+        message.error('An error occurred while adding the entity.'+error.message);
     }
   };
 
@@ -54,26 +54,30 @@ const AddEntityButton: React.FC<AddEntityButtonProps> = ({
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
+      <Button style={{marginBottom: "10px"}} type="primary" onClick={showModal} icon={<PlusCircleOutlined  />}>
         Add {entityLabel}
       </Button>
-      {loading && <div className="overlay"> <Spin size="large" /></div>}
-      <Modal
+      {/* {loading && <div className="overlay"> <Spin size="large" /></div>} */}
+        <Drawer
         title={`Add ${entityLabel}`}
-        visible={visible}
-        onOk={handleOk}
-        onCancel={handleCancel}
+        placement="right"
+        onClose={handleCancel}
+        open={visible}
+        width={500}
       >
-        <Form form={form}>
+        <Form layout='horizontal' form={form}>
           {formInputs.map((input) => (
-            <Form.Item key={input.name} name={input.name} label={input.label} rules={input.rules}>
+            <Form.Item labelCol={{ span: 6 }} wrapperCol={{ span: 16 }} key={input.name} name={input.name} label={input.label} rules={input.rules}>
               {input.inputElement}
             </Form.Item>
           ))}
+          <Button block type='primary' onClick={handleOk} icon={<SaveOutlined />} style={{fontWeight: "bold"}}>
+            Save
+          </Button>
         </Form>
-      </Modal>
+      </Drawer>
     </>
   );
 };
 
-export default AddEntityButton;
+export default AddListForm;

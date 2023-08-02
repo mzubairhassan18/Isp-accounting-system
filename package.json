@@ -7,11 +7,13 @@
     "@reduxjs/toolkit": "^1.9.5",
     "antd": "^5.7.3",
     "axios": "^1.4.0",
+    "framer-motion": "^10.15.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
     "react-redux": "^8.1.1",
     "react-router-dom": "^6.14.2",
+    "react-transition-group": "^4.4.5",
     "redux": "^4.2.1",
     "redux-form": "^8.3.10",
     "redux-thunk": "^2.4.2"

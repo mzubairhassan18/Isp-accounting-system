@@ -7,4 +7,20 @@ export const apiEndpoints = {
   
   fetchUsers: `${BASE_URL}/api/user/getUsers`,
   createUser: `${BASE_URL}/api/user/addUser`,
+  deleteUser: (userId: string) => `${BASE_URL}/api/user/deleteUser/${userId}`,
+
+  // role
+  fetchRoles: `${BASE_URL}/api/role/getRoles`,
+  createRole: `${BASE_URL}/api/role/addRole`,
+  deleteRole: (userId: string) => `${BASE_URL}/api/role/deleteRole/${userId}`,
+
+  // Package
+  fetchPackages: `${BASE_URL}/api/package/getPackages`,
+  createPackage: `${BASE_URL}/api/package/addPackage`,
+  deletePackage: (userId: string) => `${BASE_URL}/api/package/deletePackage/${userId}`,
+
+  // connection
+  fetchConnections: `${BASE_URL}/api/connection/getConnections`,
+  createConnection: `${BASE_URL}/api/connection/addConnection`,
+  deleteConnection: (userId: string) => `${BASE_URL}/api/connection/deleteConnection/${userId}`,
 };

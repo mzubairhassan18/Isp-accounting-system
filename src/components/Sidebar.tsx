@@ -7,6 +7,9 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  UserAddOutlined,
+  TeamOutlined,
+  BoxPlotOutlined,LinkOutlined 
 } from '@ant-design/icons';
 import logo from "../assets/logo.png";
 import "./sidebar.css"
@@ -48,6 +51,28 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
               key: '3',
               icon: <Link to={"/account"}><UploadOutlined /></Link>,
               label: 'Accounts',
+            },
+            {
+              key: '4',
+              icon: <Link to={"/user"}><UserAddOutlined /></Link>,
+              label: 'Users',
+            },
+            {
+              key: '5',
+              icon: <Link to={"/role"}><TeamOutlined  /></Link>,
+              label: 'Roles',
+            
+            },
+            {
+              key: '6',
+              icon: <Link to={"/package"}><BoxPlotOutlined   /></Link>,
+              label: 'Packages',
+            }
+            ,
+            {
+              key: '7',
+              icon: <Link to={"/connection"}><LinkOutlined /></Link>,
+              label: 'Connections',
             }
           ]}
         />
