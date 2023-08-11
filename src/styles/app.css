@@ -10,42 +10,41 @@
   position: relative; /* Ensure the overlay is positioned relative to the content area */
 }
 
-
 .overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white background */
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.5
+  ); /* Semi-transparent white background */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
 
+.fade-appear,
 .fade-enter {
   opacity: 0;
-  transform: translateX(-20px); /* Start from slightly left */
+  z-index: 1;
 }
-
-.fade-enter-active {
+.fade-appear-active,
+.fade-enter.fade-enter-active {
   opacity: 1;
-  transform: translateX(0); /* Slide to the original position */
-  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out; /* Using ease-in-out timing function */
+  transition: opacity 450ms linear 250ms;
 }
-
 .fade-exit {
   opacity: 1;
-  transform: translateX(0); /* Slide from the original position */
 }
-
-.fade-exit-active {
+.fade-exit.fade-exit-active {
   opacity: 0;
-  transform: translateX(-20px); /* Slide slightly left before disappearing */
-  transition: opacity 500ms ease-in-out, transform 500ms ease-in-out; /* Using ease-in-out timing function */
+  transition: opacity 150ms linear;
 }
-
 
 .slide-enter {
   opacity: 0;
@@ -54,7 +53,9 @@
 .slide-enter-active {
   opacity: 1;
   transform: translateX(0);
-  transition: opacity 1000ms, transform 1000ms; /* Changed from 300ms to 1000ms to match the timeout value */
+  transition:
+    opacity 1000ms,
+    transform 1000ms; /* Changed from 300ms to 1000ms to match the timeout value */
 }
 .slide-exit {
   opacity: 1;
@@ -63,6 +64,80 @@
 .slide-exit-active {
   opacity: 0;
   transform: translateX(100%);
-  transition: opacity 1000ms, transform 1000ms; /* Changed from 300ms to 1000ms to match the timeout value */
+  transition:
+    opacity 1000ms,
+    transform 1000ms; /* Changed from 300ms to 1000ms to match the timeout value */
 }
 
+/* Smooth and finer scroll for the entire app */
+body,
+.ant-layout,
+.ant-drawer-content-wrapper {
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #f0f0f0;
+}
+
+/* Custom scrollbar style for WebKit browsers (e.g., Chrome, Safari) */
+body::-webkit-scrollbar,
+.ant-layout::-webkit-scrollbar,
+.ant-drawer-content-wrapper::-webkit-scrollbar {
+  width: 8px;
+}
+
+body::-webkit-scrollbar-thumb,
+.ant-layout::-webkit-scrollbar-thumb,
+.ant-drawer-content-wrapper::-webkit-scrollbar-thumb {
+  background-color: #888888;
+}
+
+body::-webkit-scrollbar-track,
+.ant-layout::-webkit-scrollbar-track,
+.ant-drawer-content-wrapper::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+/* Custom scrollbar style for Firefox */
+body,
+.ant-layout,
+.ant-drawer-content-wrapper {
+  scrollbar-width: thin;
+}
+
+body,
+.ant-layout,
+.ant-drawer-content-wrapper {
+  scrollbar-color: #888888 #f0f0f0;
+}
+
+/* You can add more specific CSS styles for different parts of your app if needed */
+
+/* Smooth and finer scroll for the sidebar */
+.sider {
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #f0f0f0;
+}
+
+/* Custom scrollbar style for WebKit browsers (e.g., Chrome, Safari) */
+.sider::-webkit-scrollbar {
+  width: 8px;
+}
+
+.sider::-webkit-scrollbar-thumb {
+  background-color: #888888;
+}
+
+.sider::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+/* Custom scrollbar style for Firefox */
+.sider {
+  scrollbar-width: thin;
+  scrollbar-color: #888888 #f0f0f0;
+}
+
+/* You can add more specific CSS styles for different parts of the sidebar if needed */

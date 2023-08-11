@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"]
+      "/*": ["*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "images.d.ts"],

@@ -1,4 +1,3 @@
-// src/components/RoleListTable.tsx
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -9,14 +8,19 @@ import {
   Form,
   Typography,
   Spin,
+  InputNumber,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { Role, deleteRoleFromAPI } from "features/role/roleSlice"; // Assuming you have an interface for the Role model
-import { deleteRole } from "features/role/roleSlice"; // Import your deleteRole action
+import {
+  InventoryItem,
+  deleteInventoryItemFromAPI,
+} from "features/inventory/inventorySlice"; // Use the inventory-related actions and interfaces
+import { deleteInventoryItem } from "features/inventory/inventorySlice"; // Import your deleteInventoryItem action
 import { AppDispatch, RootState } from "/store";
+import { ColumnsType } from "antd/es/table";
 
-interface RoleListTableProps {
-  roles: Role[];
+interface InventoryListTableProps {
+  inventoryItems: InventoryItem[]; // Rename the prop
 }
 
 interface EditableCellProps {
@@ -24,12 +28,12 @@ interface EditableCellProps {
   dataIndex: string;
   title: string;
   inputType: "text" | "number";
-  record: Role;
+  record: InventoryItem;
   children?: React.ReactNode;
   index: number;
 }
 
-const EditableCell: React.FC<any> = ({
+const EditableCell: React.FC<EditableCellProps> = ({
   editing,
   dataIndex,
   title,
@@ -39,9 +43,8 @@ const EditableCell: React.FC<any> = ({
   children,
   ...restProps
 }) => {
-  const [form] = Form.useForm();
-  const inputNode =
-    inputType === "number" ? <Input type="number" /> : <Input />;
+  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+
   return (
     <td {...restProps}>
       {editing ? (
@@ -64,59 +67,45 @@ const EditableCell: React.FC<any> = ({
   );
 };
 
-const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
-  console.log("Roles list props", roles);
+const InventoryListTable: React.FC<InventoryListTableProps> = ({
+  inventoryItems,
+}) => {
+  console.log("Inventory items list props", inventoryItems);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState<string>("");
-  const [editingKey, setEditingKey] = useState("");
+  const [editingKey, setEditingKey] = useState<string>("");
   const [form] = Form.useForm();
-  const [data, setData] = useState(roles);
-  const loading = useSelector((state: RootState) => state.role.loading);
-  console.log("Roles from effect 1", roles);
-  console.log("Loading from effect 1", loading);
+  const [data, setData] = useState<InventoryItem[]>(inventoryItems); // Update the data state with inventory items
+  const loading = useSelector((state: RootState) => state.inventory.loading); // Use the inventory-related state
+
   useEffect(() => {
-    console.log("Roles from effect", roles);
-    console.log("Loading from effect", loading);
-    setData(roles);
-  }, [roles, loading]);
+    console.log("Inventory items from effect", inventoryItems);
+    setData(inventoryItems); // Update the data state when inventory items change
+  }, [inventoryItems]);
 
   const handleDelete = async (id: string) => {
     try {
-      dispatch(deleteRoleFromAPI(id));
-      await message.success("Role deleted successfully.");
+      dispatch(deleteInventoryItemFromAPI(id));
+      await message.success("Inventory item deleted successfully.");
     } catch (error) {
       // If an error occurs during the API call or dispatching, it will be caught here
       // You can handle the error if needed
-      message.error("Failed to delete role.");
+      message.error("Failed to delete inventory item.");
     }
   };
 
   const renderCell = (props: EditableCellProps) => {
-    const {
-      editing,
-      dataIndex,
-      title,
-      inputType,
-      record,
-      index,
-      ...restProps
-    } = props;
+    const { editing, dataIndex, title, inputType, record, index } = props;
     return (
-      <td {...restProps}>
-        {editing ? (
-          <EditableCell
-            editing={editing}
-            dataIndex={dataIndex}
-            title={title}
-            inputType={inputType}
-            record={record}
-            index={index}
-          />
-        ) : (
-          restProps.children
-        )}
-      </td>
+      <EditableCell
+        editing={editing}
+        dataIndex={dataIndex}
+        title={title}
+        inputType={inputType}
+        record={record}
+        index={index}
+      />
     );
   };
 
@@ -124,103 +113,20 @@ const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
     // Perform bulk delete action here using selectedRowKeys array
     // ...
     setSelectedRowKeys([]);
-    message.success("Selected Roles deleted successfully.");
+    message.success("Selected inventory items deleted successfully.");
   };
 
   const handleSearch = (value: string) => {
     setSearchInput(value);
   };
 
-  const handleCancel = () => {
-    // Cancel editing mode
+  const cancel = () => {
     setEditingKey("");
-  };
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchInput("");
-  };
-
-  const columns = [
-    {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      sorter: (a, b) => a.id.localeCompare(b.id),
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      editable: true,
-    },
-    {
-      title: "Permissions",
-      dataIndex: "permissions",
-      key: "permissions",
-      sorter: (a, b) => a.permissions.localeCompare(b.permissions),
-      editable: true,
-    },
-    {
-      title: "Operation",
-      dataIndex: "operation",
-      fixed: "right",
-      width: 150,
-      responsive: ["md"],
-      render: (_: any, record: Role) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <span>
-            <Typography.Link
-              onClick={() => save(record.id)}
-              style={{ marginRight: 8 }}
-            >
-              Save
-            </Typography.Link>
-            <Popconfirm title="Sure to cancel?" onConfirm={handleCancel}>
-              <a>Cancel</a>
-            </Popconfirm>
-          </span>
-        ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Edit
-          </Typography.Link>
-        );
-      },
-    },
-    {
-      title: "Delete",
-      dataIndex: "delete",
-      fixed: "right",
-      width: 100,
-      responsive: ["md"],
-      render: (_: any, record: Role) => (
-        <Popconfirm
-          title="Are you sure you want to delete this role?"
-          onConfirm={() => handleDelete(record.id)}
-          okText="Yes"
-          cancelText="No"
-        >
-          <Button type="primary" danger>
-            Delete
-          </Button>
-        </Popconfirm>
-      ),
-    },
-  ];
-
-  const edit = (record: Role) => {
-    form.setFieldsValue({ id: "", name: "", permissions: "", ...record });
-    setEditingKey(record.id);
   };
 
   const save = async (id: string) => {
     try {
-      const row = (await form.validateFields()) as Role;
+      const row = (await form.validateFields()) as InventoryItem;
 
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
@@ -242,29 +148,121 @@ const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
     }
   };
 
-  const isEditing = (record: Role) => record.id === editingKey;
+  const isEditing = (record: InventoryItem) => record.id === editingKey;
 
+  const columns = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      sorter: (a, b) => a.id.localeCompare(b.id),
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      editable: true,
+    },
+    {
+      title: "Unit",
+      dataIndex: "unit",
+      key: "unit",
+      sorter: (a, b) => a.unit.localeCompare(b.unit),
+      editable: true,
+    },
+    {
+      title: "Quantity Available",
+      dataIndex: "qty_available",
+      key: "qty_available",
+      sorter: (a, b) => (a.qty_available || 0) - (b.qty_available || 0),
+    },
+    {
+      title: "MOQ",
+      dataIndex: "moq",
+      key: "moq",
+      sorter: (a, b) => (a.moq || 0) - (b.moq || 0),
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      fixed: "right",
+      width: 150,
+      responsive: ["md"],
+      render: (_: any, record: InventoryItem) => {
+        const editable = isEditing(record);
+        return editable ? (
+          <span>
+            <Typography.Link
+              onClick={() => save(record.id)}
+              style={{ marginRight: 8 }}
+            >
+              Save
+            </Typography.Link>
+            <Popconfirm title="Sure to cancel?" onConfirm={cancel}>
+              <a>Cancel</a>
+            </Popconfirm>
+          </span>
+        ) : (
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => edit(record)}
+          >
+            Edit
+          </Typography.Link>
+        );
+      },
+    },
+    {
+      title: "Delete",
+      dataIndex: "delete",
+      fixed: "right",
+      width: 100,
+      responsive: ["md"],
+      render: (_: any, record: InventoryItem) => (
+        <Popconfirm
+          title="Are you sure you want to delete this item?"
+          onConfirm={() => handleDelete(record.id)}
+          okText="Yes"
+          cancelText="No"
+        >
+          <Button type="primary" danger>
+            Delete
+          </Button>
+        </Popconfirm>
+      ),
+    },
+  ];
+
+  const edit = (record: InventoryItem) => {
+    form.setFieldsValue({
+      id: "",
+      name: "",
+      unit: "",
+      qty_available: "",
+      moq: "",
+      ...record,
+    });
+    setEditingKey(record.id);
+  };
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
       return col;
     }
     return {
       ...col,
-      onCell: (record: Role) => ({
+      onCell: (record: InventoryItem) => ({
         record,
-        inputType: "text",
+        inputType:
+          col.dataIndex === "moq" || col.dataIndex === "qty_available"
+            ? "number"
+            : "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
       }),
     };
   });
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: (selectedKeys: string[]) => setSelectedRowKeys(selectedKeys),
-  };
-
   return (
     <>
       <div style={{ marginBottom: 16 }}>
@@ -275,7 +273,7 @@ const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
           </div>
         )}
         <Input.Search
-          placeholder="Search name or permissions"
+          placeholder="Search name or unit"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onSearch={handleSearch}
@@ -290,23 +288,22 @@ const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
       </div>
       <Form form={form} component={false}>
         <Table
-          components={{
-            body: {
-              cell: EditableCell,
-            },
-          }}
           rowKey="id"
-          rowSelection={rowSelection}
+          rowSelection={{
+            selectedRowKeys,
+            onChange: (selectedKeys: string[]) =>
+              setSelectedRowKeys(selectedKeys),
+          }}
           // @ts-ignore
           columns={mergedColumns}
           rowClassName="editable-row"
           pagination={{ pageSize: 10 }}
-          scroll={{ y: 240 }}
-          dataSource={data.filter((data) => {
+          scroll={{ y: 500 }}
+          dataSource={data.filter((item) => {
             const searchText = searchInput.toLowerCase();
             return (
-              data.name?.toLowerCase().includes(searchText) ||
-              data.permissions?.toLowerCase().includes(searchText)
+              item.name?.toLowerCase().includes(searchText) ||
+              item.unit?.toLowerCase().includes(searchText)
             );
           })}
         />
@@ -315,4 +312,4 @@ const RoleListTable: React.FC<RoleListTableProps> = ({ roles }) => {
   );
 };
 
-export default RoleListTable;
+export default InventoryListTable;

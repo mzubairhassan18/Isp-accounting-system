@@ -4,7 +4,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { AppThunk } from 'types'; // Assuming you have a custom AppThunk type
 import { apiEndpoints } from 'api';
-import { RootState } from '@/store';
+import { RootState } from 'store';
 
 export interface Role {
   id: string;
@@ -69,28 +69,32 @@ export const fetchRoles = (): AppThunk => async (dispatch) => {
   }
 };
 
-export const addRole = (newRole: Role): AppThunk => async (dispatch, getState) => {
-  try {
-    dispatch(setLoading(true));
-    const response = await axios.post<Role>(apiEndpoints.createRole, newRole); // Replace with your actual API endpoint
-    const updatedRoles = [...getState().role.roles, response.data];
-    dispatch(setRoles(updatedRoles));
-    dispatch(setLoading(false));
-  } catch (error) {
-    dispatch(setError(error.message || 'Failed to add role'));
-    dispatch(setLoading(false));
-    throw error;
-  }
-};
+export const addRole =
+  (newRole: Role): AppThunk =>
+  async (dispatch, getState) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.post<Role>(apiEndpoints.createRole, newRole); // Replace with your actual API endpoint
+      const updatedRoles = [...getState().role.roles, response.data];
+      dispatch(setRoles(updatedRoles));
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setError(error.message || 'Failed to add role'));
+      dispatch(setLoading(false));
+      throw error;
+    }
+  };
 
-export const deleteRoleFromAPI = (roleId: string): AppThunk => async (dispatch) => {
-  try {
-    dispatch(setLoading(true));
-    await axios.delete(apiEndpoints.deleteRole(roleId)); // Replace with your actual API endpoint
-    dispatch(deleteRole(roleId)); // Dispatch the deleteRole action to update the state
-    dispatch(setLoading(false));
-  } catch (error) {
-    dispatch(setError(error.message || 'Failed to delete role'));
-    throw error;
-  }
-};
+export const deleteRoleFromAPI =
+  (roleId: string): AppThunk =>
+  async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      await axios.delete(apiEndpoints.deleteRole(roleId)); // Replace with your actual API endpoint
+      dispatch(deleteRole(roleId)); // Dispatch the deleteRole action to update the state
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setError(error.message || 'Failed to delete role'));
+      throw error;
+    }
+  };
