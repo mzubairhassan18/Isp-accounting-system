@@ -1,10 +1,15 @@
 // src/features/account/accountSlice.ts
 
-import { createSlice, PayloadAction, AnyAction, ThunkAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import { AppThunk } from 'types'; // Assuming you have a custom AppThunk type
-import { apiEndpoints } from 'api';
-import { RootState } from '@/store';
+import {
+  createSlice,
+  PayloadAction,
+  AnyAction,
+  ThunkAction,
+} from "@reduxjs/toolkit";
+import axios from "axios";
+import { AppThunk } from "types"; // Assuming you have a custom AppThunk type
+import { apiEndpoints } from "api";
+import { RootState } from "/store";
 
 export interface Account {
   id: string;
@@ -18,7 +23,7 @@ interface AccountState {
   error: string | null;
 }
 interface DeleteAccountAction {
-  type: 'account/deleteAccount';
+  type: "account/deleteAccount";
   payload: string; // The ID of the account to delete
 }
 const initialState: AccountState = {
@@ -28,7 +33,7 @@ const initialState: AccountState = {
 };
 
 const accountSlice = createSlice({
-  name: 'account',
+  name: "account",
   initialState,
   reducers: {
     setAccounts: (state, action: PayloadAction<Account[]>) => {
@@ -45,12 +50,15 @@ const accountSlice = createSlice({
     },
     deleteAccount: (state: AccountState, action: DeleteAccountAction) => {
       const accountId = action.payload;
-      state.accounts = state.accounts.filter((account) => account.id !== accountId);
-    }
+      state.accounts = state.accounts.filter(
+        (account) => account.id !== accountId
+      );
+    },
   },
 });
 
-export const { setAccounts, setLoading, setError, deleteAccount } = accountSlice.actions;
+export const { setAccounts, setLoading, setError, deleteAccount } =
+  accountSlice.actions;
 
 export default accountSlice.reducer;
 
@@ -61,31 +69,38 @@ export const fetchAccounts = (): AppThunk => async (dispatch) => {
     const response = await axios.get<Account[]>(apiEndpoints.fetchAccounts); // Replace with your actual API endpoint
     dispatch(setAccounts(response.data));
   } catch (error) {
-    dispatch(setError(error.message || 'Failed to fetch accounts'));
+    dispatch(setError(error.message || "Failed to fetch accounts"));
   }
 };
 
-export const addAccount = (newAccount: Account): AppThunk => async (dispatch, getState) => {
-  try {
-    dispatch(setLoading(true));
-    const response = await axios.post<Account>(apiEndpoints.createAccount, newAccount); // Replace with your actual API endpoint
-    const updatedAccounts = [...getState().account.accounts, response.data];
-    dispatch(setAccounts(updatedAccounts));
-    dispatch(setLoading(false));
-  } catch (error) {
-    dispatch(setError(error.message || 'Failed to add account'));
-    throw error;
-  }
-};
+export const addAccount =
+  (newAccount: Account): AppThunk =>
+  async (dispatch, getState) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await axios.post<Account>(
+        apiEndpoints.createAccount,
+        newAccount
+      ); // Replace with your actual API endpoint
+      const updatedAccounts = [...getState().account.accounts, response.data];
+      dispatch(setAccounts(updatedAccounts));
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setError(error.message || "Failed to add account"));
+      throw error;
+    }
+  };
 
-export const deleteAccountFromAPI = (accountId: string): AppThunk => async (dispatch) => {
-  try {
-    dispatch(setLoading(true));
-    await axios.delete(apiEndpoints.deleteAccount(accountId)); // Replace with your actual API endpoint
-    dispatch(deleteAccount(accountId)); // Dispatch the deleteAccount action to update the state
-    dispatch(setLoading(false));
-  } catch (error) {
-    dispatch(setError(error.message || 'Failed to delete account'));
-    throw error;
-  }
-};
+export const deleteAccountFromAPI =
+  (accountId: string): AppThunk =>
+  async (dispatch) => {
+    try {
+      dispatch(setLoading(true));
+      await axios.delete(apiEndpoints.deleteAccount(accountId)); // Replace with your actual API endpoint
+      dispatch(deleteAccount(accountId)); // Dispatch the deleteAccount action to update the state
+      dispatch(setLoading(false));
+    } catch (error) {
+      dispatch(setError(error.message || "Failed to delete account"));
+      throw error;
+    }
+  };

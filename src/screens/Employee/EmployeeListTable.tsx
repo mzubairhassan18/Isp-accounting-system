@@ -1,4 +1,3 @@
-// src/components/UserListTable.tsx
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -11,16 +10,15 @@ import {
   Spin,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { User, deleteUserFromAPI } from "features/user/userSlice"; // Assuming you have an interface for the User model
-import { deleteUser } from "features/user/userSlice"; // Import your deleteUser action
+import {
+  Employee,
+  deleteEmployeeFromAPI,
+} from "features/employee/employeeSlice"; // Assuming you have an interface for the Employee model
+import { deleteEmployee } from "features/employee/employeeSlice"; // Import your deleteEmployee action
 import { AppDispatch, RootState } from "/store";
 
-import type { ColumnsType } from "antd/es/table";
-import StatusButton from "components/StatusButton";
-import EditableInput from "components/EditableInput";
-
-interface UserListTableProps {
-  users: User[];
+interface EmployeeListTableProps {
+  employees: Employee[];
 }
 
 interface EditableCellProps {
@@ -28,7 +26,7 @@ interface EditableCellProps {
   dataIndex: string;
   title: string;
   inputType: "text" | "number";
-  record: User;
+  record: Employee;
   children?: React.ReactNode;
   index: number;
 }
@@ -59,7 +57,7 @@ const EditableCell: React.FC<any> = ({
             },
           ]}
         >
-          <EditableInput inputType={inputType} value={record[dataIndex]} />
+          {inputNode}
         </Form.Item>
       ) : (
         children
@@ -68,29 +66,31 @@ const EditableCell: React.FC<any> = ({
   );
 };
 
-const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
-  console.log("Users list props", users);
+const EmployeeListTable: React.FC<EmployeeListTableProps> = ({ employees }) => {
+  console.log("Employees list props", employees);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
   const [searchInput, setSearchInput] = useState<string>("");
   const [editingKey, setEditingKey] = useState("");
   const [form] = Form.useForm();
-  const [data, setData] = useState(users);
-  const loading = useSelector((state: RootState) => state.user.loading);
-
+  const [data, setData] = useState(employees);
+  const loading = useSelector((state: RootState) => state.employee.loading);
+  console.log("Employees from effect 1", employees);
+  console.log("Loading from effect 1", loading);
   useEffect(() => {
-    console.log("users from effect", users);
-    setData(users);
-  }, [users, loading]);
+    console.log("Employees from effect", employees);
+    console.log("Loading from effect", loading);
+    setData(employees);
+  }, [employees]);
 
   const handleDelete = async (id: string) => {
     try {
-      dispatch(deleteUserFromAPI(id));
-      await message.success("User deleted successfully.");
+      dispatch(deleteEmployeeFromAPI(id));
+      await message.success("Employee deleted successfully.");
     } catch (error) {
       // If an error occurs during the API call or dispatching, it will be caught here
       // You can handle the error if needed
-      message.error("Failed to delete user.");
+      message.error("Failed to delete employee.");
     }
   };
 
@@ -121,161 +121,58 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
       </td>
     );
   };
+
   const handleBulkDelete = () => {
     // Perform bulk delete action here using selectedRowKeys array
     // ...
     setSelectedRowKeys([]);
-    message.success("Selected Users deleted successfully.");
+    message.success("Selected Employees deleted successfully.");
   };
+
   const handleSearch = (value: string) => {
     setSearchInput(value);
   };
+
   const handleCancel = () => {
     // Cancel editing mode
     setEditingKey("");
   };
+
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
     setSearchInput("");
   };
+
   const columns = [
     {
-      title: "Username",
+      title: "Employee Name",
       dataIndex: "username",
       key: "username",
-      width: 150,
-      sorter: (a, b) => a.username.localeCompare(b.username),
+      sorter: (a: Employee, b: Employee) =>
+        a.username.localeCompare(b.username),
+    },
+    {
+      title: "Employee Salary",
+      dataIndex: "salary",
+      key: "salary",
       editable: true,
+      sorter: (a: Employee, b: Employee) => a.salary - b.salary,
     },
     {
-      title: "Full Name",
-      dataIndex: "full_name",
-      key: "full_name",
-      width: 150,
-      sorter: (a, b) => a.full_name.localeCompare(b.full_name),
+      title: "Employee Designation",
+      dataIndex: "designation",
+      key: "designation",
       editable: true,
+      sorter: (a: Employee, b: Employee) =>
+        a.designation.localeCompare(b.designation),
     },
     {
-      title: "Status",
-      dataIndex: "active",
-      key: "active",
-      inputType: "switch",
-      width: 150,
-      sorter: (a, b) => (a.active ? 1 : -1) - (b.active ? 1 : -1),
-      editable: true,
-      render: (active) => <StatusButton isActive={active} />,
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      width: 150,
-      sorter: (a, b) => a.email.localeCompare(b.email),
-      editable: true,
-    },
-    {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
-      width: 150,
-      sorter: (a, b) => (a.phone || 0) - (b.phone || 0),
-      editable: true,
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-      width: 200,
-      sorter: (a, b) => (a.address || "").localeCompare(b.address || ""),
-      editable: true,
-    },
-    {
-      title: "CNIC",
-      dataIndex: "cnic",
-      key: "cnic",
-      width: 150,
-      sorter: (a, b) => (a.cnic || 0) - (b.cnic || 0),
-      editable: true,
-    },
-    {
-      title: "Fee",
-      dataIndex: "fee",
-      key: "fee",
-      width: 150,
-      inputType: "number",
-      sorter: (a, b) => (a.fee || 0) - (b.fee || 0),
-      editable: true,
-    },
-    {
-      title: "Pay Date",
-      dataIndex: "pay_date",
-      key: "pay_date",
-      inputType: "number",
-      width: 100,
-      sorter: (a, b) => (a.pay_date || 0) - (b.pay_date || 0),
-      editable: true,
-    },
-    {
-      title: "Created At",
-      dataIndex: "created_at",
-      key: "created_at",
-      inputType: "date",
-      width: 150,
-      sorter: (a, b) => {
-        if (!a.created_at) return -1;
-        if (!b.created_at) return 1;
-        return a.created_at.localeCompare(b.created_at);
-      },
-      render: (created_at: Date | null) =>
-        created_at ? created_at.toString() : "N/A",
-    },
-    {
-      title: "Modified At",
-      dataIndex: "modified_at",
-      key: "modified_at",
-      inputType: "date",
-      editable: true,
-      width: 150,
-      sorter: (a, b) => {
-        if (!a.modified_at) return -1;
-        if (!b.modified_at) return 1;
-        return a.modified_at.localeCompare(b.modified_at);
-      },
-      render: (modified_at: Date | null) =>
-        modified_at ? modified_at.toString() : "N/A",
-    },
-    {
-      title: "Supervisor",
-      dataIndex: "supervisor",
-      key: "supervisor",
-      inputType: "select",
-      width: 150,
-      sorter: (a, b) => a.supervisor?.localeCompare(b.supervisor || ""),
-      editable: true,
-    },
-    {
-      title: "Initial Charges",
-      dataIndex: "intial_charges",
-      key: "intial_charges",
-      width: 150,
-      sorter: (a, b) => (a.intial_charges || 0) - (b.intial_charges || 0),
-      editable: true,
-    },
-    {
-      title: "Package ID",
-      dataIndex: "package_id",
-      key: "package_id",
-      width: 150,
-      sorter: (a, b) => a.package_id?.localeCompare(b.package_id || ""),
-      editable: true,
-    },
-    {
-      title: "operation",
+      title: "Operation",
       dataIndex: "operation",
       fixed: "right",
       width: 150,
       responsive: ["md"],
-      render: (_: any, record: User) => {
+      render: (_: any, record: Employee) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
@@ -305,9 +202,9 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
       fixed: "right",
       width: 100,
       responsive: ["md"],
-      render: (_: any, record: User) => (
+      render: (_: any, record: Employee) => (
         <Popconfirm
-          title="Are you sure you want to delete this user?"
+          title="Are you sure you want to delete this employee?"
           onConfirm={() => handleDelete(record.id)}
           okText="Yes"
           cancelText="No"
@@ -320,15 +217,21 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
     },
   ];
 
-  const edit = (record: User) => {
-    form.setFieldsValue({ id: "", name: "", type: "", ...record });
+  const edit = (record: Employee) => {
+    form.setFieldsValue({
+      id: "",
+      name: "",
+      salary: 0,
+      designation: "",
+      ...record,
+    });
     setEditingKey(record.id);
   };
+
   const save = async (id: string) => {
     try {
-      const row = (await form.validateFields()) as User;
-      console.log(row);
-      console.log(editingKey);
+      const row = (await form.validateFields()) as Employee;
+
       const newData = [...data];
       const index = newData.findIndex((item) => id === item.id);
       if (index > -1) {
@@ -338,7 +241,6 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
           ...row,
         });
         setData(newData);
-
         setEditingKey("");
       } else {
         newData.push(row);
@@ -349,22 +251,25 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
       console.log("Validate Failed:", errInfo);
     }
   };
-  const isEditing = (record: User) => record.id === editingKey;
+
+  const isEditing = (record: Employee) => record.id === editingKey;
+
   const mergedColumns = columns.map((col) => {
     if (!col.editable) {
       return col;
     }
     return {
       ...col,
-      onCell: (record: User) => ({
+      onCell: (record: Employee) => ({
         record,
-        inputType: col.inputType ? col.inputType : "text",
+        inputType: "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
       }),
     };
   });
+
   const rowSelection = {
     selectedRowKeys,
     onChange: (selectedKeys: string[]) => setSelectedRowKeys(selectedKeys),
@@ -380,7 +285,7 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
           </div>
         )}
         <Input.Search
-          placeholder="Search name or type"
+          placeholder="Search employee name or designation"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onSearch={handleSearch}
@@ -406,13 +311,13 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
           columns={mergedColumns}
           rowClassName="editable-row"
           pagination={{ pageSize: 10 }}
-          scroll={{ x: 1500 }}
+          scroll={{ y: 240 }}
           dataSource={data.filter((data) => {
             const searchText = searchInput.toLowerCase();
+            // Filter the employees based on searchInput
             return (
-              data.username?.toLowerCase().includes(searchText) ||
-              data.full_name?.toLowerCase().includes(searchText) ||
-              data.email?.toLowerCase().includes(searchText)
+              data.username?.toString().toLowerCase().includes(searchText) ||
+              data.designation?.toLowerCase().includes(searchText)
             );
           })}
         />
@@ -421,4 +326,4 @@ const UserListTable: React.FC<UserListTableProps> = ({ users }) => {
   );
 };
 
-export default UserListTable;
+export default EmployeeListTable;

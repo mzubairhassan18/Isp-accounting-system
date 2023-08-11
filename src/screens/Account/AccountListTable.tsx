@@ -1,23 +1,29 @@
 // src/components/AccountListTable.tsx
-import React, { useState, useEffect } from 'react';
-import { Table, Button, Popconfirm, message, Input, Form, Typography, Spin } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import  { Account } from 'features/account/accountSlice'; // Assuming you have an interface for the Account model
-import { deleteAccount } from 'features/account/accountSlice'; // Import your deleteAccount action
-import { AppDispatch, RootState } from '@/store';
-
-
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Popconfirm,
+  message,
+  Input,
+  Form,
+  Typography,
+  Spin,
+} from "antd";
+import { useDispatch, useSelector } from "react-redux";
+import { Account } from "features/account/accountSlice"; // Assuming you have an interface for the Account model
+import { deleteAccount } from "features/account/accountSlice"; // Import your deleteAccount action
+import { AppDispatch, RootState } from "/store";
 
 interface AccountListTableProps {
   accounts: Account[];
 }
 
-
 interface EditableCellProps {
   editing: boolean;
   dataIndex: string;
   title: string;
-  inputType: 'text' | 'number';
+  inputType: "text" | "number";
   record: Account;
   children?: React.ReactNode;
   index: number;
@@ -34,7 +40,8 @@ const EditableCell: React.FC<any> = ({
   ...restProps
 }) => {
   const [form] = Form.useForm();
-  const inputNode = inputType === 'number' ? <Input type="number" /> : <Input />;
+  const inputNode =
+    inputType === "number" ? <Input type="number" /> : <Input />;
   return (
     <td {...restProps}>
       {editing ? (
@@ -61,8 +68,8 @@ const AccountListTable: React.FC<AccountListTableProps> = ({ accounts }) => {
   console.log("accounts list props", accounts);
   const dispatch = useDispatch<AppDispatch>();
   const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
-  const [searchInput, setSearchInput] = useState<string>('');
-  const [editingKey, setEditingKey] = useState('');
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [editingKey, setEditingKey] = useState("");
   const [form] = Form.useForm();
   const [data, setData] = useState(accounts);
   const loading = useSelector((state: RootState) => state.account.loading);
@@ -72,10 +79,18 @@ const AccountListTable: React.FC<AccountListTableProps> = ({ accounts }) => {
 
   const handleDelete = (id: string) => {
     dispatch(deleteAccount(id));
-    message.success('Account deleted successfully.');
+    message.success("Account deleted successfully.");
   };
   const renderCell = (props: EditableCellProps) => {
-    const { editing, dataIndex, title, inputType, record,index, ...restProps } = props;
+    const {
+      editing,
+      dataIndex,
+      title,
+      inputType,
+      record,
+      index,
+      ...restProps
+    } = props;
     return (
       <td {...restProps}>
         {editing ? (
@@ -97,48 +112,51 @@ const AccountListTable: React.FC<AccountListTableProps> = ({ accounts }) => {
     // Perform bulk delete action here using selectedRowKeys array
     // ...
     setSelectedRowKeys([]);
-    message.success('Selected accounts deleted successfully.');
+    message.success("Selected accounts deleted successfully.");
   };
   const handleSearch = (value: string) => {
     setSearchInput(value);
   };
   const handleCancel = () => {
     // Cancel editing mode
-    setEditingKey('');
+    setEditingKey("");
   };
   const handleReset = (clearFilters: () => void) => {
     clearFilters();
-    setSearchInput('');
+    setSearchInput("");
   };
   const columns = [
     {
-      title: 'ID',
-      dataIndex: 'id',
-      key: 'id',
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
       sorter: (a: Account, b: Account) => a.id.localeCompare(b.id),
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
       sorter: (a: Account, b: Account) => a.name.localeCompare(b.name),
       editable: true,
     },
     {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
       sorter: (a: Account, b: Account) => a.type.localeCompare(b.type),
       editable: true,
     },
     {
-      title: 'operation',
-      dataIndex: 'operation',
+      title: "operation",
+      dataIndex: "operation",
       render: (_: any, record: Account) => {
         const editable = isEditing(record);
         return editable ? (
           <span>
-            <Typography.Link onClick={() => save(record.id)} style={{ marginRight: 8 }}>
+            <Typography.Link
+              onClick={() => save(record.id)}
+              style={{ marginRight: 8 }}
+            >
               Save
             </Typography.Link>
             <Popconfirm title="Sure to cancel?" onConfirm={handleCancel}>
@@ -146,7 +164,10 @@ const AccountListTable: React.FC<AccountListTableProps> = ({ accounts }) => {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link disabled={editingKey !== ''} onClick={() => edit(record)}>
+          <Typography.Link
+            disabled={editingKey !== ""}
+            onClick={() => edit(record)}
+          >
             Edit
           </Typography.Link>
         );
@@ -154,10 +175,10 @@ const AccountListTable: React.FC<AccountListTableProps> = ({ accounts }) => {
     },
   ];
   const edit = (record: Account) => {
-    form.setFieldsValue({ id: '', name: '', type: '', ...record });
+    form.setFieldsValue({ id: "", name: "", type: "", ...record });
     setEditingKey(record.id);
   };
-const save = async (id: string) => {
+  const save = async (id: string) => {
     try {
       const row = (await form.validateFields()) as Account;
 
@@ -170,14 +191,14 @@ const save = async (id: string) => {
           ...row,
         });
         setData(newData);
-        setEditingKey('');
+        setEditingKey("");
       } else {
         newData.push(row);
         setData(newData);
-        setEditingKey('');
+        setEditingKey("");
       }
     } catch (errInfo) {
-      console.log('Validate Failed:', errInfo);
+      console.log("Validate Failed:", errInfo);
     }
   };
   const isEditing = (record: Account) => record.id === editingKey;
@@ -189,7 +210,7 @@ const save = async (id: string) => {
       ...col,
       onCell: (record: Account) => ({
         record,
-        inputType: 'text',
+        inputType: "text",
         dataIndex: col.dataIndex,
         title: col.title,
         editing: isEditing(record),
@@ -204,15 +225,23 @@ const save = async (id: string) => {
   return (
     <>
       <div style={{ marginBottom: 16 }}>
-      {loading && <div className="overlay"> <Spin size="large" /></div>}
-      <Input.Search
+        {loading && (
+          <div className="overlay">
+            {" "}
+            <Spin size="large" />
+          </div>
+        )}
+        <Input.Search
           placeholder="Search name or type"
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           onSearch={handleSearch}
           style={{ width: 200, marginRight: 8 }}
         />
-        <Button onClick={handleBulkDelete} disabled={selectedRowKeys.length === 0}>
+        <Button
+          onClick={handleBulkDelete}
+          disabled={selectedRowKeys.length === 0}
+        >
           Bulk Delete
         </Button>
       </div>
@@ -228,11 +257,11 @@ const save = async (id: string) => {
           columns={mergedColumns}
           rowClassName="editable-row"
           pagination={{ pageSize: 10 }}
-          scroll={{y: 240}}
+          scroll={{ y: 240 }}
           dataSource={data.filter(
             (data) =>
-            data.name.toLowerCase().includes(searchInput.toLowerCase()) ||
-            data.type.toLowerCase().includes(searchInput.toLowerCase())
+              data.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+              data.type.toLowerCase().includes(searchInput.toLowerCase())
           )}
         />
       </Form>
